@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 from bs4 import BeautifulSoup
-
+import re
 app = Flask(__name__)
 
 
@@ -50,18 +50,24 @@ def query_ebay_listings(query):
 
             priceElement = item.find('span', class_='s-item__price') 
             price = priceElement.text.strip() if priceElement else '<Price not found>'
+            
 
             date_element = item.find('span', class_='POSITIVE')
             date = date_element.text.strip() if date_element else '<Date not found>'
 
             href_element = item.find('a', class_='s-item__link')
+      
             href = href_element['href'] if href_element and 'href' in href_element.attrs else '<href not found>'
+
+            pic_element = item.find('div', class_='s-item__image-wrapper image-treatment')
+            pic = pic_element.find('img')
 
             data.append({
                 "title" : title,
                 "price" : price,
                 "date" : date,
-                "url": href
+                "url": href, 
+                "picUrl" : pic['src']
             })
 
         return{"data" : data}
